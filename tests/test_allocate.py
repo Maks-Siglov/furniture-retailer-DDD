@@ -1,6 +1,9 @@
 import datetime
 
+import pytest
+
 from src.allocation import allocate
+from src.exceptions import OutOfStock
 from src.models import Batch, OrderLine
 
 
@@ -56,3 +59,12 @@ def test_allocation_prefers_earliest_eta_batch():
     assert batch_in_shipment2.available_quantity == initial_qty
 
     assert allocation == batch_in_shipment1.reference
+
+
+def test_out_of_stock_exc_if_cannot_allocate():
+
+    small_batch = Batch(reference="ref-264", quantity=10, sku="BLUE-VASE")
+    large_line = OrderLine(order_id="order-272", quantity=20, sku="BLUE-VASE")
+
+    with pytest.raises(OutOfStock):
+        allocate(large_line, [small_batch])
