@@ -52,3 +52,10 @@ class Batch:
 
     def __hash__(self):
         return hash(self.reference)
+
+    def __gt__(self, other):
+        if self.eta is None:
+            return False
+        if other.eta is None:
+            return True
+        return self.eta > other.eta

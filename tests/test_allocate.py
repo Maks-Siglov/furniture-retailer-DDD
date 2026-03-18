@@ -25,7 +25,7 @@ def test_allocation_prefers_warehouse_over_shipment():
 
     assert batch_in_shipment.available_quantity == initial_qty
 
-    assert allocation == batch_in_shipment.reference
+    assert allocation == batch_in_stock.reference
 
 
 def test_allocation_prefers_earliest_eta_batch():
