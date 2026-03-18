@@ -1,6 +1,4 @@
 
-import pytest
-
 from src.models import Batch, OrderLine
 
 
@@ -15,20 +13,35 @@ def test_allocate_reduce_batch_quantity():
     assert batch.available_quantity == desired_quantity
 
 
+def test_can_allocate_batch_and_line():
+    batch = Batch(reference="sdg-243", quantity=10, sku="BLUE-VASE")
+    line = OrderLine(order_id="order-143", quantity=4, sku="BLUE-VASE")
+
+    assert batch.can_allocate(line)
+
+
+def test_can_allocate_batch_and_line_when_qty_is_equal():
+    qty = 10
+    batch = Batch(reference="sdg-243", quantity=qty, sku="BLUE-VASE")
+    line = OrderLine(order_id="order-143", quantity=qty, sku="BLUE-VASE")
+
+    assert batch.can_allocate(line)
+
+
 def test_cannot_allocate_larger_order_line():
     batch = Batch(reference="sf-255", quantity=10, sku="BLUE-VASE")
     line = OrderLine(order_id="order-125", quantity=12, sku="BLUE-VASE")
 
-    with pytest.raises(ValueError):
-        batch.allocate(line)
+    assert batch.can_allocate(line) is False
 
 
 def test_cannot_allocate_different_sku_to_batch():
     batch = Batch(reference="sf-255", quantity=10, sku="BLUE-VASE")
-    line = OrderLine(order_id="order-125", quantity=2, sku="RED-CHAIR")
+    different_sku_line = OrderLine(
+        order_id="order-125", quantity=2, sku="RED-CHAIR"
+    )
 
-    with pytest.raises(ValueError):
-        batch.allocate(line)
+    assert batch.can_allocate(different_sku_line) is not False
 
 
 def test_batch_allocation_idempotent():
